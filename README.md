@@ -1,16 +1,15 @@
-# Photobook API
+# Scrum bot
 
 ## Installation
-
-`git clone https://github.com/gmoralesc/photobook-api`
 
 `npm install`
 
 Create a `.env` file in the root directory, example:
 
 ```
-SERVER_HOSTNAME=127.0.0.1
-SERVER_PORT=3000
+DATABASE_URL=mongodb://root:root_12345@localhost:27017
+TELEGRAM_BOT_TOKEN=624139337:AAEByb0x8AQU-2DNvPlyOKfAjuLt30tXqBY
+TRELLO_API_KEY=f539c73a53faa0ab15abd442925f56e0
 ```
 
 ## RUN
