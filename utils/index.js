@@ -13,3 +13,5 @@ exports.updateUser = (bot, chatId, responseMsg, body = {}) => {
       bot.sendMessage(chatId, config.errorMsg, { parse_mode: 'markdown' });
     });
 };
+
+exports.getState = chatId => usersController.get(chatId);

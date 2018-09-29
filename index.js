@@ -1,8 +1,8 @@
 const TelegramBot = require('node-telegram-bot-api');
 
-const config = require('./config');
+const { config, constants } = require('./config');
 const database = require('./database');
-const { updateUser } = require('./utils');
+const { updateUser, getState } = require('./utils');
 // const { ApiTrello } = require('./services/trello/index') ;
 
 database.connect();
@@ -28,21 +28,13 @@ bot.on('message', (msg) => {
   console.log(msg, chatId);
 
   switch (msg.text) {
-    case config.states[0]: {
-      const responseMsg =
-        ` Welcome ${msg.from.first_name}, You can control me by sending these commands:
-        *Trello*
-        ${config.states[1]} - Set trello account
-        *GitHub*
-        /setgithub - Set trello account
-        `;
-      updateUser(bot, chatId, responseMsg, { state: config.states[0] });
+    case constants.states[0].state: {
+      updateUser(bot, chatId, constants.states[0].msg, { state: constants.states[0].state });
       break;
     }
-    case config.states[1]: {
+    case constants.states[1].state: {
       // const apiTrello = new ApiTrello();
-      const responseMsg = 'Works!';
-      updateUser(bot, chatId, responseMsg, { state: config.states[1] });
+      updateUser(bot, chatId, constants.states[1].msg, { state: constants.states[1].state });
       // const responseMsg =
       // ` Welcome ${msg.from.first_name}, You can control me by sending these commands:
       // *Trello*
@@ -53,10 +45,9 @@ bot.on('message', (msg) => {
       // bot.sendMessage(chatId, responseMsg, { parse_mode: 'markdown' });
       break;
     }
-    case config.states[2]: {
+    case constants.states[2].state: {
       // const apiTrello = new ApiTrello();
-      const responseMsg = 'Works!';
-      updateUser(bot, chatId, responseMsg, { state: config.states[2] });
+      updateUser(bot, chatId, constants.states[2].msg, { state: constants.states[2].state });
       // const responseMsg =
       // ` Welcome ${msg.from.first_name}, You can control me by sending these commands:
       // *Trello*
@@ -68,7 +59,32 @@ bot.on('message', (msg) => {
       break;
     }
     default: {
-      console.log('default');
+      getState(chatId)
+        .then(doc => {
+          const state = doc.state;
+          console.log(state);
+          switch (state) {
+            case constants.states[0].state: {
+              updateUser(bot, chatId, constants.states[0].msg);
+              break;
+            }
+            case constants.states[1].state: {
+              updateUser(bot, chatId, constants.states[1].res, { state: constants.states[0].state });
+              break;
+            }
+            case constants.states[2].state: {
+              updateUser(bot, chatId, constants.states[2].res, { state: constants.states[0].state });
+              break;
+            }
+            default: {
+              console.log('default');
+            }
+          }
+        })
+        .catch(err => {
+          console.log(err);
+          bot.sendMessage(chatId, config.errorMsg, { parse_mode: 'markdown' });
+        });
     }
   }
 

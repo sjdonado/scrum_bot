@@ -13,6 +13,6 @@ TRELLO_API_KEY=f539c73a53faa0ab15abd442925f56e0
 ```
 
 ## RUN
-
+`docker-compose up (optional)`
 - Development: `npm run dev`
 - Production: `npm start`
