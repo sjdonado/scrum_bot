@@ -7,20 +7,3 @@ exports.createOrUpdate = body =>
 
 exports.get = chatId =>
   Model.findOne({chatId});
-
-// exports.delete = (req, res, next) => {
-//   const {
-//     doc,
-//   } = req;
-
-//   doc.remove()
-//     .then((removed) => {
-//       res.json({
-//         success: true,
-//         item: removed,
-//       });
-//     })
-//     .catch((err) => {
-//       next(new Error(err));
-//     });
-// };

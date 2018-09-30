@@ -12,7 +12,10 @@ const fields = {
   trelloApiToken: {
     type: String,
   },
-  githubApiToken: {
+  githubUser: {
+    type: String,
+  },
+  githubRepo: {
     type: String,
   },
   state: {
@@ -22,6 +25,15 @@ const fields = {
   text: {
     type: String,
     trim: true,
+  },
+  backlogId: {
+    type: String,
+  },
+  todoId: {
+    type: String,
+  },
+  doneId: {
+    type: String,
   },
 };
 

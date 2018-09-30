@@ -6,12 +6,12 @@ exports.updateUser = (bot, chatId, responseMsg, body = {}) => {
   usersController.createOrUpdate(body)
     .then(doc => {
       console.log(doc);
-      bot.sendMessage(chatId, responseMsg, { parse_mode: 'markdown' });
+      if(bot && responseMsg) bot.sendMessage(chatId, responseMsg, { parse_mode: 'markdown' });
     })
     .catch(err => {
       console.log(err);
-      bot.sendMessage(chatId, config.errorMsg, { parse_mode: 'markdown' });
+      if(bot) bot.sendMessage(chatId, config.errorMsg, { parse_mode: 'markdown' });
     });
 };
 
-exports.getState = chatId => usersController.get(chatId);
+exports.getUser = chatId => usersController.get(chatId);
