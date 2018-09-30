@@ -10,23 +10,23 @@ exports.TrelloApi = class TrelloApi {
   }
   
   setTrelloToken(bot, chatId, token) {
-    this.get('/1/members/me')
-      .then(doc => {
-        console.log(doc);
-        createOrUpdate(bot, chatId, constants.states.setUpTrello.res, 
-          { state: constants.states.initial.state, trelloId: doc.id, trelloApiToken: token });
-        createOrUpdate(null, this.chatId, null, {  });
-      })
-      .catch(err => {
-        console.log(err);
-      });
+  this.get('/1/members/me')
+    .then(doc => {
+      console.log(doc);
+      createOrUpdate(bot, chatId, constants.states.setUpTrello.res, 
+        { state: constants.states.initial.state, trelloId: doc.id, trelloApiToken: token });
+    })
+    .catch(err => {
+      createOrUpdate(bot, chatId, constants.states.setUpTrello.err, {});
+      console.log(err);
+    });
   }
 
   verifyBoard(bot, chatId, trelloId, name) {
     this.get(`/1/members/${trelloId}/boards`)
       .then(boards => {
         const boardsNames = boards.map(board => board.name);
-        if(boardsNames.includes(name.toLowerCase())){
+        if(boardsNames.includes(name)){
           boards.forEach(board => {
             if(board.name == name) {
               createOrUpdate(bot, chatId, constants.states.setBoard.res, 
@@ -55,18 +55,28 @@ exports.TrelloApi = class TrelloApi {
       });
   }
 
-  generateLists(bot, idBoard) {
-    let promises = [];
-    constants.lists.forEach(list => {
-      promises.push(this.post(`/1/lists`, { name: list.name, idBoard }));
-    });
-    Promise.all(promises).then(values => {
-      console.log(values);
-      values.forEach((value, index) => {
-        createOrUpdate(bot, this.chatId, `${value.name} list was generated correctly.`, 
-        { [constants.lists[index].key]: value.id, state: constants.states.initial.state });
+  generateLists(bot, chatId, idBoard) {
+    this.get(`/1/boards/${idBoard}/lists`)
+      .then(lists => lists.map(list => list.name))
+      .then(listsNames => {
+        let promises = [];
+        constants.lists.forEach(list => {
+          if(!listsNames.includes(list.name)) promises.push(this.post(`/1/lists`, { name: list.name, idBoard }));
+        });
+        Promise.all(promises).then(values => {
+          console.log(values);
+          values.forEach((value, index) => {
+            createOrUpdate(bot, this.chatId, `${value.name} list was generated correctly.`, 
+            { [constants.lists[index].key]: value.id, state: constants.states.initial.state });
+          });
+        });
+      })
+      .then(() => {
+        bot.sendMessage(chatId, constants.states.importIssues.res, { parse_mode: 'markdown' });
+      })
+      .catch(err => {
+        console.log(err);
       });
-    });
   }
 
   addCard(idList, name, opts = {}) {
@@ -75,47 +85,44 @@ exports.TrelloApi = class TrelloApi {
     return this.post('/1/cards/', data);
   }
 
-  getListCards(idList, callback) {
-    this.get(`/1/lists/${idList}/cards`)
-      .then(doc => {
-        console.log(doc);
-        callback(doc);
-      })
-      .catch(err => {
-        console.log(err);
-      });
+  getListCards(idList) {
+    return this.get(`/1/lists/${idList}/cards`) 
   }
 
   importIssues (bot, user) {
-    this.getListCards(user.idBacklog, cards => {
+    this.getListCards(user.idBacklog)
+    .then(cards => {
       getIssues(user.githubUser, user.githubRepo)
-      .then(issues => {
+        .then(issues => {
           const cardsNames = cards.map(card => card.name);
+          console.log('CARDS', cardsNames);
           let promises = [];
           issues.forEach(issue => {
-            if(!cardsNames.includes(issue.name)) 
-              promises.push(this.addCard(user.backlogId, issue.title, { urlSource:issue.url }));
+            if(!cardsNames.includes(issue.title)) 
+              promises.push(this.addCard(user.idBacklog, issue.title, { urlSource: issue.url }));
           });
-          Promise.all(promises).then(values => {
-            console.log(values);
-            values.forEach(value => {
-              createOrUpdate(bot, this.chatId, `${value.name} issue was imported correctly.`, 
-                { state: constants.states.initial.state });
+          if(promises.length > 0) {
+            Promise.all(promises).then(values => {
+              console.log(values);
+              values.forEach(value => {
+                createOrUpdate(bot, this.chatId, `${value.name} issue was imported correctly.`, 
+                  { state: constants.states.initial.state });
+              });
             });
-          })
-          .then(() => {
-            bot.sendMessage(user.chatId, constants.states.importIssues.res, { parse_mode: 'markdown' });
-          });
-      })
-      .catch(err => {
-        console.log(err);
-        bot.sendMessage(user.chatId, constants.states.errorMsg, { parse_mode: 'markdown' });
-      });
+            createOrUpdate(bot, this.chatId, constants.states.importIssues.res, 
+              {state: constants.states.initial.state });
+          }else{
+            bot.sendMessage(this.chatId, constants.states.getIssues.err, { parse_mode: 'markdown' });
+          }
+        });
+    })
+    .catch(err => {
+      console.log(err);
     });
   }
 
   importContributors (bot, user){
-    getContributors(bot, user.chatId, user.githubUser, user.githubRepo)
+    getContributors(bot, this.chatId, user.githubUser, user.githubRepo)
       .then(res => {
         if(res.status == 200) {
           res.json()
@@ -134,24 +141,26 @@ exports.TrelloApi = class TrelloApi {
                     });
                   })
                   .then(() => {
-                    bot.sendMessage(user.chatId, constants.states.importContributors.res, { parse_mode: 'markdown' });
+                    bot.sendMessage(this.chatId, constants.states.importContributors.res, { parse_mode: 'markdown' });
                   });
                 })
                 .catch(err => {
                   console.log(err);
                 });
-              bot.sendMessage(user.chatId, 'All rignt :)', { parse_mode: 'markdown' });
+              // bot.sendMessage(this.chatId, 'All rignt :)', { parse_mode: 'markdown' });
               });
             })
             .catch(res => {
               console.log(res);
-              bot.sendMessage(user.chatId, constants.states.errorMsg, { parse_mode: 'markdown' });
+              bot.sendMessage(this.chatId, constants.states.errorMsg, { parse_mode: 'markdown' });
             });
+        }else{
+          bot.sendMessage(this.chatId, constants.states.importContributors.err_empty, { parse_mode: 'markdown' });
         }
       })
       .catch(err => {
         console.log(err);
-        bot.sendMessage(user.chatId, constants.states.errorMsg, { parse_mode: 'markdown' });
+        bot.sendMessage(this.chatId, constants.states.errorMsg, { parse_mode: 'markdown' });
       });
   }
   

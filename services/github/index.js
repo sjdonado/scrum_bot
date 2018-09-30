@@ -10,13 +10,11 @@ exports.showIssues = (bot, chatId, username, repo) => {
       if(doc && doc.length > 0) {
         bot.sendMessage(chatId, `Issues list of ${repo}`, { parse_mode: 'markdown' });
         doc.forEach(issue => {
-          console.log(issue);
+          // console.log(issue);
           promises.push(bot.sendMessage(chatId, `- *Title:* ${issue.title}, *Comments:* ${issue.comments}`, 
             { parse_mode: 'markdown' }));
         });
-        Promise.all(promises).then(values => {
-          console.log(values);
-        })
+        Promise.all(promises)
         .then(() => {
           createOrUpdate(bot, chatId, constants.states.getIssues.res, {state: constants.states.initial.state });
         });
@@ -44,6 +42,24 @@ exports.verifyRepo = (bot, chatId, username, repo) => {
       console.log(err);
       bot.sendMessage(chatId, constants.states.errorMsg, { parse_mode: 'markdown' });
     });
+};
+
+exports.verifyUser = (bot, chatId, username) => {
+  fetch(`${constants.GITHUB_PATH}/users/${username}`)
+  .then(res => res.json())
+  .then(doc => {
+    console.log(doc,username);
+    if(doc.id) {
+      createOrUpdate(bot, chatId, constants.states.setGithub.res, 
+        {githubUser: username });
+    }else{
+      createOrUpdate(bot, chatId, constants.states.setGithub.err, {});
+    }
+  })
+  .catch(err => {
+    console.log(err);
+    bot.sendMessage(chatId, constants.states.errorMsg, { parse_mode: 'markdown' });
+  });
 };
 
 exports.getIssues = (user, repo) => {
