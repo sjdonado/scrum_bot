@@ -48,7 +48,7 @@ exports.constants = {
     setGithub: { 
       state: '/setgithub', 
       msg: 'Ingresa tu usuario:',
-      res:  'Usuario guardado correctamente' + returnMenu,
+      res:  'Usuario guardado correctamente. ' + returnMenu,
       err: 'Credenciales de github no encontradas. ' + returnMenu
     },
     getIssues: { 

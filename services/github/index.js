@@ -6,8 +6,8 @@ exports.showIssues = (bot, chatId, user, repo) => {
   fetch(`https://api.github.com/repos/${user}/${repo}/issues`)
     .then(res => res.json())
     .then(doc => {
-      if(doc) {
-        bot.sendMessage(chatId, 'Issues list. Import? (y/n)', { parse_mode: 'markdown' });
+      if(doc && doc.length > 0) {
+        bot.sendMessage(chatId, 'Issues list. Import to backlog? (y/n)', { parse_mode: 'markdown' });
         doc.forEach(issue => {
           console.log(issue);
           bot.sendMessage(chatId, `Title: ${issue.title}asdasdasasdasd, Comments: ${issue.comments}`, { parse_mode: 'markdown' });
