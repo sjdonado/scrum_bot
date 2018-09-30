@@ -47,13 +47,14 @@ exports.TrelloApi = class TrelloApi {
     });
   }
 
-  importIssues (bot, user, repo) {
+  importIssues (bot, user) {
     this.getListCards(user.backlogId, cards => {
-      getIssues(user.githubUser, repo)
+      getIssues(user.githubUser, user.githubRepo)
       .then(issues => {
+          console.log('ISSUES', issues);
           const cardsNames = cards.map(card => card.name);
           issues.forEach(issue => {
-            if(!cardsNames.includes(issue.name)) this.addCard(user.backlogId, issue.title);
+            if(!cardsNames.includes(issue.name)) this.addCard(user.backlogId, issue.title, { urlSource:issue.url });
           });
       })
       .catch(err => {

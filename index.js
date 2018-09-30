@@ -61,7 +61,7 @@ bot.on('message', (msg) => {
                   case constants.states.importIssues.state: {
                     if(user.githubUser && user.trelloApiToken && user.backlogId) {
                       let trelloApi = new TrelloApi(user.chatId, user.trelloApiToken);
-                      trelloApi.importIssues(bot, user, msg.text);
+                      trelloApi.importIssues(bot, user);
                       createOrUpdate(bot, chatId, constants.states.importIssues.res, 
                         {state: constants.states.initial.state });
                     }else{
