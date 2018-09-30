@@ -72,7 +72,7 @@ exports.TrelloApi = class TrelloApi {
         });
       })
       .then(() => {
-        bot.sendMessage(chatId, constants.states.importIssues.res, { parse_mode: 'markdown' });
+        bot.sendMessage(chatId, constants.states.gLists.res, { parse_mode: 'markdown' });
       })
       .catch(err => {
         console.log(err);

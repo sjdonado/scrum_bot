@@ -111,7 +111,7 @@ bot.on('message', (msg) => {
                 trelloApi.generateNewBoard(msg.text);
                 createOrUpdate(bot, chatId, constants.states.newBoard.res, {state: constants.states.initial.state });
               }else{
-                bot.sendMessage(chatId, constants.states.setUpTrello.err, { parse_mode: 'markdown' });
+                bot.sendMessage(chatId, constants.states.newBoard.err, { parse_mode: 'markdown' });
               }
               break;
             }

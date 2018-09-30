@@ -54,8 +54,7 @@ exports.constants = {
       /setboard - Setup trello dashboard.
       /newboard - Generate new trello dashboard.
       /glists - Generate scrum lists`,
-      err: `Trello access token not found, that's can setup with the next command:
-      /setuptrello - Setup trello access token.`
+      err: 'Trello access token not found, please retype' + returnMenu
     },
     setBoard: {
       state: '/setboard',
@@ -71,14 +70,18 @@ exports.constants = {
       msg: 
       'Enter the dashboard name:',
       res: 
-      'Dashboard was generated correctly.' + returnMenu
+      `Dashboard was generated correctly, you can generate the scrum lists with the next command:
+      /glists - Generate scrum lists.`,
+      err: `Trello access token not found, that's can setup with the next command:
+      /setuptrello - Setup trello access token.`
     },
     gLists: {
       state: '/glists',
       res: 
       `Lists was generated correctly, you can import the github issues with the next command:
       /importissues - Import all the repository issues to trello.`,
-      err: 'You need to setup trello and github accounts.' + returnMenu
+      err: `You need to setup your boards and issues, you can see your config saved with the next command:
+      /viewconfig - Show config saved.`
     },
     viewConfig: { 
       state: '/viewconfig',
@@ -88,7 +91,8 @@ exports.constants = {
       msg: 
       'Enter your github username:',
       res: 
-       'User save was completed correctly.' + returnMenu,
+       `User save was completed correctly, you can set your github repository with the next command:
+       /setrepo - Setup github repository name.`,
       err: 'Username not found, please retype:' + returnMenu
     },
     setRepo: { 
@@ -96,8 +100,8 @@ exports.constants = {
       msg: 
       'Enter the repository name:',
       res: 
-      `Repository save was completed correctly, you can see all the repository issues with the next command:
-      /getissues - Get all the respository issues.`,
+      `Repository save was completed correctly, you can import all the repository issues with the next command:
+      /importissues - Import all the repository issues to trello.`,
       err: 'Repository not found, please retype:' + returnMenu
     },
     getIssues: { 
@@ -112,15 +116,17 @@ exports.constants = {
       state: '/importissues', 
       msg: 
       'Enter the repository name:',
-      res: 
+      res:
       'Import was completed correctly.' + returnMenu,
-      err: 'You need to setup trello and github accounts.' + returnMenu
+      err: `You need to setup your boards and issues, you can see your config saved with the next command:
+      /viewconfig - Show config saved.`
     },
     importContributors: {
       state: '/importcontributors',
       res: 
       'Import was completed correctly.' + returnMenu,
-      err: 'You need to setup trello and github accounts.' + returnMenu,
+      err: `You need to setup your boards and issues, you can see your config saved with the next command:
+      /viewconfig - Show config saved.`,
       err_empty: `This repository not have contributors, you can change the repository with the next command:
       /setrepo - Setup github repository name.`,
     }
