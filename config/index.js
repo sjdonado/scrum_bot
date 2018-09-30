@@ -9,7 +9,6 @@ exports.config = {
   },
   apis: {
     trello: process.env.TRELLO_API_KEY,
-    github: process.env.GITHUB_API_KEY
   },
 };
 
