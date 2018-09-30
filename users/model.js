@@ -26,14 +26,21 @@ const fields = {
     type: String,
     trim: true,
   },
+  idBoard: {
+    type: String,
+    trim: true,
+  },
   backlogId: {
     type: String,
+    trim: true,
   },
   todoId: {
     type: String,
+    trim: true,
   },
   doneId: {
     type: String,
+    trim: true,
   },
 };
 

@@ -3,16 +3,16 @@ const { constants } = require('../../config');
 const { createOrUpdate } = require('../../users/controller');
 
 exports.showIssues = (bot, chatId, username, repo) => {
-  fetch(`https://api.github.com/repos/${username}/${repo}/issues`)
+  fetch(`${constants.GITHUB_PATH}/repos/${username}/${repo}/issues`)
     .then(res => res.json())
     .then(doc => {
       if(doc && doc.length > 0) {
         bot.sendMessage(chatId, `Issues list of ${repo}`, { parse_mode: 'markdown' });
         doc.forEach(issue => {
           console.log(issue);
-          bot.sendMessage(chatId, `Title: ${issue.title}, Comments: ${issue.comments}`, { parse_mode: 'markdown' });
+          bot.sendMessage(chatId, `- *Title:* ${issue.title}, *Comments:* ${issue.comments}`, { parse_mode: 'markdown' });
         });
-        createOrUpdate(bot, chatId, constants.states.getIssues.res, {state: constants.states.setup.state });
+        createOrUpdate(bot, chatId, constants.states.getIssues.res, {state: constants.states.initial.state });
       }else{
         bot.sendMessage(chatId, constants.states.getIssues.err, { parse_mode: 'markdown' });
       }
@@ -24,11 +24,11 @@ exports.showIssues = (bot, chatId, username, repo) => {
 };
 
 exports.verifyRepo = (bot, chatId, username, repo) => {
-  fetch(`https://api.github.com/repos/${username}/${repo}`)
+  fetch(`${constants.GITHUB_PATH}/repos/${username}/${repo}`)
     .then(res => res.json())
     .then(doc => {
       if(doc.id) {
-        createOrUpdate(bot, chatId, constants.states.setRepo.res, {githubRepo: repo, state: constants.states.setup.state });
+        createOrUpdate(bot, chatId, constants.states.setRepo.res, {githubRepo: repo, state: constants.states.initial.state });
       }else{
         createOrUpdate(bot, chatId, constants.states.setRepo.err, {});
       }
@@ -40,6 +40,10 @@ exports.verifyRepo = (bot, chatId, username, repo) => {
 };
 
 exports.getIssues = (user, repo) => {
-  return fetch(`https://api.github.com/repos/${user}/${repo}/issues`)
+  return fetch(`${constants.GITHUB_PATH}/repos/${user}/${repo}/issues`)
     .then(res => res.json());
+};
+
+exports.getContributors = (bot, chatId, username, repo) => {
+  return fetch(`${constants.GITHUB_PATH}/repos/${username}/${repo}/contributors`);
 };

@@ -17,7 +17,11 @@ const returnMenu = ` You can see the menu with the next command:
 /setup - Show the menu`;
 
 exports.constants = {
+  GITHUB_PATH: 'https://api.github.com',
   states: {
+    initial: {
+      state: null
+    },
     setup: { 
       state: '/setup', 
       msg: `You can control me by sending these commands:
@@ -78,6 +82,9 @@ exports.constants = {
       res: 'Import was completed correctly.' + returnMenu,
       err: 'You need to setup the accounts.' + returnMenu
     },
+    getContributors: {
+      state: '/getcontributors'
+    }
   },
   lists: [
     {key: 'backlogId', name: 'Backlog'},
