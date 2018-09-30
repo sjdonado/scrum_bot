@@ -1,6 +1,6 @@
 const Trello = require('node-trello');
 const { config, constants } = require('../../config');
-const { updateUser } = require('../../utils');
+const { createOrUpdate } = require('../../users/controller');
 const { getIssues } = require('../github');
 
 exports.TrelloApi = class TrelloApi {
@@ -21,7 +21,7 @@ exports.TrelloApi = class TrelloApi {
       if (err) throw err;
       console.log(doc);
       doc.forEach((list, index) => {
-        updateUser(null, this.chatId, null, { [constants.lists[index].key]: list.id });
+        createOrUpdate(null, this.chatId, null, { [constants.lists[index].key]: list.id });
         this.trello.put(`/1/lists/${list.id}`, { name: constants.lists[index].name}, (err, doc) => {
           if (err) throw err;
           console.log(doc);
@@ -37,16 +37,26 @@ exports.TrelloApi = class TrelloApi {
     });
   }
 
-  importIssues (user) {
-    getIssues(user.githubUser, user.githubRepo)
-    .then(doc => {
-      console.log(doc);
-      doc.forEach(issue => {
-        this.addCard(user.backlogId, issue.title, '');
+  getListCards(idList, callback) {
+    this.trello.get(`/1/lists/${idList}/cards`, (err, doc) => {
+      if (err) throw err;
+      callback(doc);
+    });
+  }
+
+  importIssues (bot, user, repo) {
+    this.getListCards(user.backlogId, cards => {
+      getIssues(user.githubUser, repo)
+      .then(issues => {
+          const cardsNames = cards.map(card => card.name);
+          issues.forEach(issue => {
+            if(!cardsNames.includes(issue.name)) this.addCard(user.backlogId, issue.title, '');
+          });
+      })
+      .catch(err => {
+        console.log(err);
+        bot.sendMessage(user.chatId, constants.states.errorMsg, { parse_mode: 'markdown' });
       });
-    })
-    .catch(err => {
-      console.log(err);
     });
   }
 };
