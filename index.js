@@ -5,6 +5,7 @@ const database = require('./db/database');
 const { TrelloApi } = require('./services/trello');
 const { showIssues, verifyRepo } = require('./services/github');
 const { createOrUpdate, get } = require('./users/controller');
+const { showConfigList } = require('./utils');
 
 database.connect();
 const bot = new TelegramBot(config.bots.telegram, { polling: true });
@@ -29,8 +30,8 @@ bot.on('message', (msg) => {
       createOrUpdate(bot, chatId, constants.states.setUpTrello.msg, { state: constants.states.setUpTrello.state });
       break;
     }
-    case constants.states.gTrello.state: {
-      createOrUpdate(bot, chatId, constants.states.gTrello.msg, { state: constants.states.gTrello.state });
+    case constants.states.newBoard.state: {
+      createOrUpdate(bot, chatId, constants.states.newBoard.msg, { state: constants.states.newBoard.state });
       break;
     }
     case constants.states.setGithub.state: {
@@ -39,6 +40,10 @@ bot.on('message', (msg) => {
     }
     case constants.states.setRepo.state: {
       createOrUpdate(bot, chatId, constants.states.setRepo.msg, { state: constants.states.setRepo.state });
+      break;
+    }
+    case constants.states.setBoard.state: {
+      createOrUpdate(bot, chatId, constants.states.setBoard.msg, { state: constants.states.setBoard.state });
       break;
     }
     default: {
@@ -59,7 +64,7 @@ bot.on('message', (msg) => {
                     break;
                   }
                   case constants.states.importIssues.state: {
-                    if(user.githubUser && user.trelloApiToken && user.backlogId) {
+                    if(user.githubUser && user.trelloApiToken && user.idBoard) {
                       let trelloApi = new TrelloApi(user.chatId, user.trelloApiToken);
                       trelloApi.importIssues(bot, user);
                       createOrUpdate(bot, chatId, constants.states.importIssues.res, 
@@ -71,17 +76,22 @@ bot.on('message', (msg) => {
                   }
                   case constants.states.viewConfig.state: {
                     console.log(user);
-                    const msg = `Config list: 
-                    - *Trello api token:* ${user.trelloApiToken || 'Not found'}
-                    - *Github user:* ${user.githubUser || 'Not found'}
-                    - *Github repo:* ${user.githubRepo || 'Not found'}`;
-                    createOrUpdate(bot, chatId, msg, {state: constants.states.initial.state });
+                    createOrUpdate(bot, chatId, showConfigList(user, constants.returnMenu), {state: constants.states.initial.state });
                     break;
                   }
-                  case constants.states.getContributors.state: {
-                    if(user.githubUser && user.trelloApiToken && user.backlogId && user.idBoard) {
+                  case constants.states.importContributors.state: {
+                    if(user.githubUser && user.trelloApiToken && user.idBoard) {
                       let trelloApi = new TrelloApi(user.chatId, user.trelloApiToken);
                       trelloApi.importContributors(bot, user);
+                    }else{
+                      bot.sendMessage(chatId, constants.notFoundMsg, { parse_mode: 'markdown' });
+                    }
+                    break;
+                  }
+                  case constants.states.gLists.state: {
+                    if(user.trelloApiToken && user.idBoard) {
+                      let trelloApi = new TrelloApi(user.chatId, user.trelloApiToken);
+                      trelloApi.generateLists(bot, user.idBoard);
                     }else{
                       bot.sendMessage(chatId, constants.notFoundMsg, { parse_mode: 'markdown' });
                     }
@@ -95,15 +105,15 @@ bot.on('message', (msg) => {
                 break;
               }
               case constants.states.setUpTrello.state: {
-                createOrUpdate(bot, chatId, constants.states.setUpTrello.res, 
-                  { state: constants.states.initial.state, trelloApiToken: msg.text });
+                let trelloApi = new TrelloApi(chatId, user.trelloApiToken);
+                trelloApi.setTrelloToken(bot, chatId, msg.text);
                 break;
               }
-              case constants.states.gTrello.state: {
+              case constants.states.newBoard.state: {
                 if(user.trelloApiToken){
                   let trelloApi = new TrelloApi(chatId, user.trelloApiToken);
-                  trelloApi.generateBoardAndLists(msg.text);
-                  createOrUpdate(bot, chatId, constants.states.gTrello.res, {state: constants.states.initial.state });
+                  trelloApi.generateNewBoard(msg.text);
+                  createOrUpdate(bot, chatId, constants.states.newBoard.res, {state: constants.states.initial.state });
                 }else{
                   bot.sendMessage(chatId, constants.states.setUpTrello.err, { parse_mode: 'markdown' });
                 }
@@ -120,6 +130,11 @@ bot.on('message', (msg) => {
                 }else{
                   bot.sendMessage(user.chatId, constants.states.setGithub.err, { parse_mode: 'markdown' });
                 }
+                break;
+              }
+              case constants.states.setBoard.state: {
+                let trelloApi = new TrelloApi(chatId, user.trelloApiToken);
+                trelloApi.verifyBoard(bot, chatId, user.trelloId, msg.text);
                 break;
               }
               default: {

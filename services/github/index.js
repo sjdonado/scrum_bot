@@ -6,13 +6,20 @@ exports.showIssues = (bot, chatId, username, repo) => {
   fetch(`${constants.GITHUB_PATH}/repos/${username}/${repo}/issues`)
     .then(res => res.json())
     .then(doc => {
+      let promises = [];
       if(doc && doc.length > 0) {
         bot.sendMessage(chatId, `Issues list of ${repo}`, { parse_mode: 'markdown' });
         doc.forEach(issue => {
           console.log(issue);
-          bot.sendMessage(chatId, `- *Title:* ${issue.title}, *Comments:* ${issue.comments}`, { parse_mode: 'markdown' });
+          promises.push(bot.sendMessage(chatId, `- *Title:* ${issue.title}, *Comments:* ${issue.comments}`, 
+            { parse_mode: 'markdown' }));
         });
-        createOrUpdate(bot, chatId, constants.states.getIssues.res, {state: constants.states.initial.state });
+        Promise.all(promises).then(values => {
+          console.log(values);
+        })
+        .then(() => {
+          createOrUpdate(bot, chatId, constants.states.getIssues.res, {state: constants.states.initial.state });
+        });
       }else{
         bot.sendMessage(chatId, constants.states.getIssues.err, { parse_mode: 'markdown' });
       }

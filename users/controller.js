@@ -4,16 +4,18 @@ const {
 
 const { constants } = require('./../config/');
 
-exports.createOrUpdate = (bot, chatId, responseMsg, body = {}) => {
+exports.createOrUpdate = (bot, chatId, responseMsg, body = {}, callback = null) => {
     Object.assign(body, {chatId});
     Model.updateOne({ chatId: body.chatId }, body, { upsert: true } )
       .then(doc => {
         console.log(doc);
         if(bot && responseMsg) bot.sendMessage(chatId, responseMsg, { parse_mode: 'markdown' });
+        if(callback) callback();
       })
       .catch(err => {
         console.log(err);
         if(bot) bot.sendMessage(chatId, constants.errorMsg, { parse_mode: 'markdown' });
+        if(callback) callback(err);
       });
   };
 

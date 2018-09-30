@@ -11,12 +11,19 @@ const fields = {
   },
   trelloApiToken: {
     type: String,
+    trim: true,
+  },
+  trelloId: {
+    type: String,
+    trim: true,
   },
   githubUser: {
     type: String,
+    trim: true,
   },
   githubRepo: {
     type: String,
+    trim: true,
   },
   state: {
     type: String,
@@ -30,15 +37,19 @@ const fields = {
     type: String,
     trim: true,
   },
-  backlogId: {
+  boardName: {
     type: String,
     trim: true,
   },
-  todoId: {
+  idBacklog: {
     type: String,
     trim: true,
   },
-  doneId: {
+  idTodo: {
+    type: String,
+    trim: true,
+  },
+  idDone: {
     type: String,
     trim: true,
   },
