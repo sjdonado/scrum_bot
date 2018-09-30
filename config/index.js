@@ -13,7 +13,7 @@ exports.config = {
 };
 
 const returnMenu = 
-` You can see the menu with the next command:
+` You can see the menu with the following command:
 /setup - Show the menu`;
 
 const menuMsg = 
@@ -60,7 +60,7 @@ exports.constants = {
       msg: 
       'Enter the board name:',
       res: 
-       `Board save was completed correctly, you can generate the scrum lists with the next command:
+       `Board save was completed correctly, you can generate the scrum lists with the following command:
        /glists - Generate scrum lists.`,
       err: 'Board not found, please retype.' + returnMenu
     },
@@ -69,17 +69,17 @@ exports.constants = {
       msg: 
       'Enter the dashboard name:',
       res: 
-      `Dashboard was generated correctly, you can generate the scrum lists with the next command:
+      `Dashboard was generated correctly, you can generate the scrum lists with the following command:
       /glists - Generate scrum lists.`,
-      err: `Trello access token not found, that's can setup with the next command:
+      err: `Trello access token not found, that's can setup with the following command:
       /setuptrello - Setup trello access token.`
     },
     gLists: {
       state: '/glists',
       res: 
-      `Lists was generated correctly, you can import the github issues with the next command:
+      `Lists was generated correctly, you can import the github issues with the following command:
       /importissues - Import all the repository issues to trello.`,
-      err: `You need to setup your boards and issues, you can see your config saved with the next command:
+      err: `You need to setup your boards and issues, you can see your config saved with the following command:
       /viewconfig - Show config saved.`
     },
     viewConfig: { 
@@ -90,7 +90,7 @@ exports.constants = {
       msg: 
       'Enter your github username:',
       res: 
-       `User save was completed correctly, you can set your github repository with the next command:
+       `User save was completed correctly, you can set your github repository with the following command:
        /setrepo - Setup github repository name.`,
       err: 'Username not found, please retype:' + returnMenu
     },
@@ -99,16 +99,16 @@ exports.constants = {
       msg: 
       'Enter the repository name:',
       res: 
-      `Repository save was completed correctly, you can import all the repository issues with the next command:
+      `Repository save was completed correctly, you can import all the repository issues with the following command:
       /importissues - Import all the repository issues to trello.`,
       err: 'Repository not found, please retype:' + returnMenu
     },
     getIssues: { 
       state: '/getissues', 
       res: 
-      `You can import this issues with the next command:
+      `You can import this issues with the following command:
       /importissues - Import all the repository issues to trello.`,
-      err: `This repository not have open issues for your board, you can change the repository with the next command:
+      err: `This repository not have open issues for your board, you can change the repository with the following command:
       /setrepo - Setup github repository name.`,
     },
     importIssues: { 
@@ -117,16 +117,16 @@ exports.constants = {
       'Enter the repository name:',
       res:
       'Import was completed correctly.' + returnMenu,
-      err: `You need to setup your boards and issues, you can see your config saved with the next command:
+      err: `You need to setup your boards and issues, you can see your config saved with the following command:
       /viewconfig - Show config saved.`
     },
     importContributors: {
       state: '/importcontributors',
       res: 
       'Import was completed correctly.' + returnMenu,
-      err: `You need to setup your boards and issues, you can see your config saved with the next command:
+      err: `You need to setup your boards and issues, you can see your config saved with the following command:
       /viewconfig - Show config saved.`,
-      err_empty: `This repository not have contributors, you can change the repository with the next command:
+      err_empty: `This repository not have contributors, you can change the repository with the following command:
       /setrepo - Setup github repository name.`,
     }
   },
